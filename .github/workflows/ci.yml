@@ -32,9 +32,21 @@ jobs:
         run: |
           zip release-${{ steps.extract_version.outputs.VERSION }}.zip manifest.json icon.png README.md
 
-      - name: Create Release Tag
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git tag ${{ steps.extract_version.outputs.VERSION }}
-          git push origin ${{ steps.extract_version.outputs.VERSION }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.extract_version.outputs.VERSION }}
+          release_name: Release ${{ steps.extract_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release-${{ steps.extract_version.outputs.VERSION }}.zip
+          asset_name: release-${{ steps.extract_version.outputs.VERSION }}.zip
+          asset_content_type: application/zip
+
+        
