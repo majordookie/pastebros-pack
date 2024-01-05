@@ -1,45 +1,32 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: 
       - 'release/*'
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
       - name: Extract Version from Branch Name
-        id: extract_version
-        run: echo "::set-output name=VERSION::$(echo ${GITHUB_REF#refs/heads/release/})"
+        run: echo "VERSION=$(echo ${GITHUB_REF#refs/heads/release/})" >> $GITHUB_ENV
 
       - name: Package Files
         run: |
-          zip release-${{ steps.extract_version.outputs.VERSION }}.zip manifest.json icon.png README.md
+          zip release-${{ env.VERSION }}.zip manifest.json icon.png README.md
 
       - name: Create Release
-        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.extract_version.outputs.VERSION }}
-          release_name: Release ${{ steps.extract_version.outputs.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
           
@@ -49,8 +36,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release-${{ steps.extract_version.outputs.VERSION }}.zip
-          asset_name: release-${{ steps.extract_version.outputs.VERSION }}.zip
+          asset_path: ./release-${{ env.VERSION }}.zip
+          asset_name: pastebros-${{ env.VERSION }}.zip
           asset_content_type: application/zip
-
-        
