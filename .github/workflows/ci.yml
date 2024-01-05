@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: 
+      - 'release/*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Extract Version from Branch Name
+        id: extract_version
+        run: echo "::set-output name=VERSION::$(echo ${GITHUB_REF#refs/heads/release/})"
+
+      - name: Package Files
+        run: |
+          zip release-${{ steps.extract_version.outputs.VERSION }}.zip manifest.json icon.png README.md
+
+      - name: Create Release Tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag ${{ steps.extract_version.outputs.VERSION }}
+          git push origin ${{ steps.extract_version.outputs.VERSION }}
