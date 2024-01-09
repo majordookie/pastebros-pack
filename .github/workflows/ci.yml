@@ -46,4 +46,4 @@ jobs:
           asset_content_type: application/zip
       - name: Upload to Thunderstore
         run: |
-          curl -X POST -H "Authorization: Bearer ${{ secrets.THUNDERSTORE_TOKEN }}" -H "Content-Type: multipart/form-data" -F "file=@./pastebros-${{ env.VERSION }}.zip" "https://thunderstore.io/api/v1/package/upload/"
+          curl -X POST -H "Authorization: Bearer ${{ secrets.THUNDERSTORE_TOKEN }}" -H "Content-Type: multipart/form-data" -F 'metadata={"author_name": "pastebros", "has_nsfw_content": false, "categories": ["modpacks"], "communities": ["lethal-company"]}' -F "file=@./pastebros-${{ env.VERSION }}.zip" "https://thunderstore.io/api/experimental/submission/upload/"
