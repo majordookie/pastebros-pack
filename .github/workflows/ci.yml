@@ -53,7 +53,6 @@ jobs:
 
               MOD_NAME=$(_jq '.name')
               AUTHOR_NAME=$(_jq '.author')
-              # Make the API call
               LATEST_VERSION=$(curl -s "https://thunderstore.io/api/experimental/package/${AUTHOR_NAME}/${MOD_NAME}/" | jq -r '.latest.version_number')
               DEPENDENCIES+=("\"${AUTHOR_NAME}-${MOD_NAME}-${LATEST_VERSION}\"")
               echo "Updating dep to ${AUTHOR_NAME}-${MOD_NAME}-${LATEST_VERSION}"
