@@ -39,9 +39,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
+      
+      - name: Fetch all branches
+        run: git fetch --all
+        
       - name: Extract Version from Branch Name
-        run: echo "VERSION=$(git branch -r | grep 'origin/release/' | sort -Vr | head -n 1 | sed 's/[ \t]*origin\/release\///' | tr -d '\n')" >> $GITHUB_ENV
+        run: |
+          LATEST_BRANCH=$(git branch -r | grep 'origin/release/' | sort -Vr | head -n 1 | sed 's/[ \t]*origin\/release\///' | tr -d '\n')
+          echo "LATEST_BRANCH=$LATEST_BRANCH"
+          echo "VERSION=$LATEST_BRANCH" >> $GITHUB_ENV
+          echo "VERSION set to $LATEST_BRANCH"
 
       - name: "Update deps in manifest.json"
         run: |
