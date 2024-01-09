@@ -135,6 +135,10 @@
     {
       "name": "ShipLoot",
       "author": "tinyhoot"
+    },
+    {
+      "name": "LethalClunk",
+      "author": "PanHouse"
     }
   ]
 }
