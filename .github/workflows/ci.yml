@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       (github.event_name == 'schedule' && needs.create_patch_release.result == 'success') ||
-      (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/') && contains(github.ref, '/release/'))
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     needs: [create_patch_release]
     steps:
       - name: Checkout
