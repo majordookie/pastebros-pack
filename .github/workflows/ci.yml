@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches: 
-      - 'release/*'
+    branches:
+      - "release/*"
   workflow_dispatch:
 
 jobs:
@@ -16,13 +16,34 @@ jobs:
       - name: Extract Version from Branch Name
         run: echo "VERSION=$(echo ${GITHUB_REF#refs/heads/release/})" >> $GITHUB_ENV
 
-      - name: Update Version in manifest.json
+      - name: "Update deps in manifest.json"
         run: |
-          jq '.version_number = "${{ env.VERSION }}"' manifest.json > temp.json && mv temp.json manifest.json
+          MODS_JSON=$(cat mods.json)
+          DEPENDENCIES=()
+          for row in $(echo "${MODS_JSON}" | jq -r '.mods[] | @base64'); do
+              _jq() {
+                echo ${row} | base64 --decode | jq -r ${1}
+              }
+
+              MOD_NAME=$(_jq '.name')
+              AUTHOR_NAME=$(_jq '.author')
+              # Make the API call
+              LATEST_VERSION=$(curl -s "https://thunderstore.io/api/experimental/package/${AUTHOR_NAME}/${MOD_NAME}/" | jq -r '.latest.version_number')
+              DEPENDENCIES+=("\"${AUTHOR_NAME}-${MOD_NAME}-${LATEST_VERSION}\"")
+              echo "Updating dep to ${AUTHOR_NAME}-${MOD_NAME}-${LATEST_VERSION}"
+          done
+
+          echo "{
+            \"name\": \"pastebros\",
+            \"version_number\": \"${VERSION}\",
+            \"website_url\": \"https://github.com/majordookie/pastebros-pack\",
+            \"description\": \"Mod pack for the paste bros\",
+            \"dependencies\": [$(IFS=, ; echo "${DEPENDENCIES[*]}")]
+          }" | jq > manifest.json
 
       - name: Package Files
         run: |
-          zip pastebros-${{ env.VERSION }}.zip manifest.json icon.png README.md
+          zip pastebros-${{ env.VERSION }}.zip manifest.json README.md && zip -j pastebros-${{ env.VERSION }}.zip resources/icon.png
 
       - name: Create Release
         id: create_release
@@ -34,7 +55,7 @@ jobs:
           release_name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
-          
+
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
