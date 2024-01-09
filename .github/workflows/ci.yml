@@ -1,17 +1,43 @@
 name: CI
 
 on:
+  schedule:
+    - cron: '47 4 * * *'
   push:
     branches:
       - "release/*"
   workflow_dispatch:
 
 jobs:
+  create_patch_release:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Fetch all branches
+        run: git fetch --all
+
+      - name: Determine New Branch Name
+        id: new_branch
+        run: |
+          LATEST_BRANCH=$(git branch -r | grep 'origin/release/' | sort -Vr | head -n 1 | sed 's/origin\/release\///')
+          IFS='.' read -ra VERSION <<< "$LATEST_BRANCH"
+          ((VERSION[2]++))
+          NEW_VERSION="${VERSION[0]}.${VERSION[1]}.${VERSION[2]}"
+          echo "NEW_BRANCH=release/$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Create and Push New Branch
+        run: |
+          git checkout -b ${{ env.NEW_BRANCH }}
+          git push origin ${{ env.NEW_BRANCH }}
+          
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Extract Version from Branch Name
         run: echo "VERSION=$(echo ${GITHUB_REF#refs/heads/release/})" >> $GITHUB_ENV
@@ -65,6 +91,7 @@ jobs:
           asset_path: ./pastebros-${{ env.VERSION }}.zip
           asset_name: pastebros-${{ env.VERSION }}.zip
           asset_content_type: application/zip
+          
       - name: Upload to Thunderstore
         run: |
           curl -X POST -H "Authorization: Bearer ${{ secrets.THUNDERSTORE_API_KEY }}" -H "Content-Type: multipart/form-data" -F 'metadata={"author_name": "pastebros", "has_nsfw_content": false, "categories": ["modpacks"], "communities": ["lethal-company"]}' -F "file=@./pastebros-${{ env.VERSION }}.zip" "https://thunderstore.io/api/experimental/submission/upload/"
