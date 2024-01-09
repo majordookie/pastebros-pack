@@ -1,5 +1,12 @@
 {
-  "mods": [
+  "name": "pastebros",
+  "author_name": "pastebros",
+  "has_nsfw_content": false,
+  "categories": ["modpacks"],
+  "communities": ["lethal-company"],
+  "website_url": "https://github.com/majordookie/pastebros-pack",
+  "description": "Mod pack for the paste bros",
+  "dependencies": [
     {
       "name": "BetterEmotes",
       "author": "KlutzyBubbles"
