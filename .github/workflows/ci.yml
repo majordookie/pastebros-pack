@@ -34,14 +34,14 @@ jobs:
           git checkout -b ${{ env.NEW_BRANCH }}
           git push origin ${{ env.NEW_BRANCH }}
           
-  build:
+  build_modpack:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Extract Version from Branch Name
-        run: echo "VERSION=$(echo ${GITHUB_REF#refs/heads/release/})" >> $GITHUB_ENV
+        run: echo "VERSION=$(git branch -r | grep 'origin/release/' | sort -Vr | head -n 1 | sed 's/[ \t]*origin\/release\///' | tr -d '\n')" >> $GITHUB_ENV
 
       - name: "Update deps in manifest.json"
         run: |
