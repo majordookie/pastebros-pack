@@ -2,7 +2,7 @@ name: CI
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '47 4 * * *'
   push:
     branches:
       - "release/*"
