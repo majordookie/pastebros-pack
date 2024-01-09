@@ -44,3 +44,6 @@ jobs:
           asset_path: ./pastebros-${{ env.VERSION }}.zip
           asset_name: pastebros-${{ env.VERSION }}.zip
           asset_content_type: application/zip
+      - name: Upload to Thunderstore
+        run: |
+          curl -X POST -H "Authorization: Bearer ${{ secrets.THUNDERSTORE_TOKEN }}" -H "Content-Type: multipart/form-data" -F "file=@./pastebros-${{ env.VERSION }}.zip" "https://thunderstore.io/api/v1/package/upload/"
