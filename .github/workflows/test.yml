@@ -37,6 +37,10 @@ jobs:
           IFS='.' read -ra VERSION <<< "$LATEST_BRANCH"
           echo ${VERSION[@]}
           PATCH_VERSION=$((PATCH_VERSION + 0))
+          if ! [[ $PATCH_VERSION =~ ^[0-9]+$ ]]; then
+            echo "Error: Patch version is not a valid number."
+            exit 1
+          fi
           ((PATCH_VERSION++))
           VERSION[2]=$PATCH_VERSION
           echo ${VERSION[@]}
