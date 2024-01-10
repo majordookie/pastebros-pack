@@ -121,7 +121,7 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           release_name: Release ${{ env.VERSION }}
-          body: Scheduled patch update to dependencies 
+          body: Scheduled patch to dependencies 
           draft: false
           prerelease: false
 
@@ -232,7 +232,6 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           release_name: Release ${{ env.VERSION }}
-          body: Minor update to modpack
           draft: false
           prerelease: false
 
