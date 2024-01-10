@@ -35,4 +35,6 @@ jobs:
           LATEST_BRANCH=$(git branch -r | grep 'origin/release/' | tr -d ' ' | sort -Vr | head -n 1 | sed 's/[ \t]*origin\/release\///' | tr -d '\n')
           echo "$LATEST_BRANCH"
           IFS='.' read -ra VERSION <<< "$LATEST_BRANCH"
-          echo "$VERSION"
+          echo ${VERSION[@]}
+          ((VERSION[2]++))
+          echo ${VERSION[@]}
