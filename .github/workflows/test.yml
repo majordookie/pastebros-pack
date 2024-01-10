@@ -36,5 +36,7 @@ jobs:
           echo "$LATEST_BRANCH"
           IFS='.' read -ra VERSION <<< "$LATEST_BRANCH"
           echo ${VERSION[@]}
-          ((VERSION[2]++))
+          PATCH_VERSION=$((PATCH_VERSION + 0))
+          ((PATCH_VERSION++))
+          VERSION[2]=$PATCH_VERSION
           echo ${VERSION[@]}
