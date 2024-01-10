@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: test
 
 # Controls when the workflow will run
 on:
@@ -34,3 +34,5 @@ jobs:
           set +x
           LATEST_BRANCH=$(git branch -r | grep 'origin/release/' | tr -d ' ' | sort -Vr | head -n 1 | sed 's/[ \t]*origin\/release\///' | tr -d '\n')
           echo "$LATEST_BRANCH"
+          IFS='.' read -ra VERSION <<< "$LATEST_BRANCH"
+          echo "$VERSION"
